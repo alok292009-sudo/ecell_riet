@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight, CheckCircle, Clock, Target, Users, Zap, ChevronRight, ExternalLink, Phone, MessageCircle, Instagram, Quote, Mail } from 'lucide-react';
+import { ArrowRight, CheckCircle, Clock, Target, Users, Zap, ChevronRight, ExternalLink, Phone, MessageCircle, Instagram, Quote, Mail, Lightbulb, Globe, User, Calendar, DollarSign, AlertCircle } from 'lucide-react';
 
 const GOOGLE_FORM_LINK = "https://docs.google.com/forms/d/e/1FAIpQLSdKRM7wXrG_F-mQyrAdKOM6A8FRKgH3ydPtQXiWaf3u01L0JQ/viewform?usp=publish-editor";
 const INSTAGRAM_LINK = "https://www.instagram.com/ecell_riet?igsh=MThvZHdlOThwbXJxeQ==";
@@ -391,17 +391,22 @@ export default function LandingPage() {
         
         <div className="grid md:grid-cols-2 gap-x-12 gap-y-10">
           {[
-            { q: "Do I need a fully formed startup idea?", a: "You need a clear problem statement. Phase 1 is dedicated to validating that problem. You don't need a full business plan yet, but you must have a direction." },
-            { q: "Is this open to all branches?", a: "Yes. We believe great founders come from every discipline. We actively encourage cross-disciplinary teams." },
-            { q: "Can I apply as a solo founder?", a: "Yes. While teams can execute faster, solo founders with high drive are welcome. You might even find potential co-founders within the cohort." },
-            { q: "What is the time commitment?", a: "Expect to spend 8–10 hours per week. This includes weekly reviews, customer interviews, and building your product. It is not a passive club." },
-            { q: "Does the program provide funding?", a: "We focus on making you investment-ready. Top teams from the Advanced Track will have opportunities to pitch to external investors and VCs." },
-            { q: "What if I miss the weekly reviews?", a: "Attendance is mandatory. This program is modeled after high-performance accelerators. Inactive or absent teams will be removed." }
+            { icon: Lightbulb, q: "Do I need a fully formed startup idea?", a: "You need a clear problem statement. Phase 1 is dedicated to validating that problem. You don't need a full business plan yet, but you must have a direction." },
+            { icon: Globe, q: "Is this open to all branches?", a: "Yes. We believe great founders come from every discipline. We actively encourage cross-disciplinary teams." },
+            { icon: User, q: "Can I apply as a solo founder?", a: "Yes. While teams can execute faster, solo founders with high drive are welcome. You might even find potential co-founders within the cohort." },
+            { icon: Calendar, q: "What is the time commitment?", a: "Enough to build something real. This program demands consistent execution, weekly reviews, and measurable progress." },
+            { icon: DollarSign, q: "Does the program provide funding?", a: "We focus on making you investment-ready. Top teams from the Advanced Track will have opportunities to pitch to external investors and VCs." },
+            { icon: AlertCircle, q: "What if I miss the weekly reviews?", a: "Attendance is mandatory. This program is modeled after high-performance accelerators. Inactive or absent teams will be removed." }
           ].map((faq, i) => (
             <FadeIn key={i} delay={i * 0.1}>
               <div className="bg-slate-900/40 p-8 rounded-2xl border border-slate-800 h-full hover:border-indigo-500/30 transition-colors">
-                <h3 className="text-lg font-bold mb-3 text-indigo-200">{faq.q}</h3>
-                <p className="text-slate-400 leading-relaxed">{faq.a}</p>
+                <div className="flex items-start gap-4 mb-3">
+                  <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 shrink-0">
+                    <faq.icon className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-lg font-bold text-indigo-200 pt-1">{faq.q}</h3>
+                </div>
+                <p className="text-slate-400 leading-relaxed pl-[52px]">{faq.a}</p>
               </div>
             </FadeIn>
           ))}
