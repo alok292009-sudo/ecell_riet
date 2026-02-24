@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight, CheckCircle, Clock, Target, Users, Zap, ChevronRight, ExternalLink, Phone, MessageCircle, Instagram, Quote } from 'lucide-react';
+import { ArrowRight, CheckCircle, Clock, Target, Users, Zap, ChevronRight, ExternalLink, Phone, MessageCircle, Instagram, Quote, Mail } from 'lucide-react';
 
 const GOOGLE_FORM_LINK = "https://docs.google.com/forms/d/e/1FAIpQLSdKRM7wXrG_F-mQyrAdKOM6A8FRKgH3ydPtQXiWaf3u01L0JQ/viewform?usp=publish-editor";
 const INSTAGRAM_LINK = "https://www.instagram.com/ecell_riet?igsh=MThvZHdlOThwbXJxeQ==";
@@ -113,15 +113,30 @@ export default function LandingPage() {
                 <h3 className="text-sm font-mono uppercase text-indigo-400 mb-4 tracking-wider font-semibold">1-Year Vision</h3>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3 group">
-                    <CheckCircle className="w-6 h-6 mt-0.5 text-slate-500 group-hover:text-indigo-400 transition-colors" />
+                    <motion.div
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <CheckCircle className="w-6 h-6 mt-0.5 text-slate-500 group-hover:text-indigo-400 transition-colors" />
+                    </motion.div>
                     <span className="text-lg text-slate-300 group-hover:text-white transition-colors">Multiple validated startups launching from campus.</span>
                   </li>
                   <li className="flex items-start gap-3 group">
-                    <CheckCircle className="w-6 h-6 mt-0.5 text-slate-500 group-hover:text-indigo-400 transition-colors" />
+                    <motion.div
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+                    >
+                      <CheckCircle className="w-6 h-6 mt-0.5 text-slate-500 group-hover:text-indigo-400 transition-colors" />
+                    </motion.div>
                     <span className="text-lg text-slate-300 group-hover:text-white transition-colors">Investment-ready teams pitching to real VCs.</span>
                   </li>
                   <li className="flex items-start gap-3 group">
-                    <CheckCircle className="w-6 h-6 mt-0.5 text-slate-500 group-hover:text-indigo-400 transition-colors" />
+                    <motion.div
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
+                    >
+                      <CheckCircle className="w-6 h-6 mt-0.5 text-slate-500 group-hover:text-indigo-400 transition-colors" />
+                    </motion.div>
                     <span className="text-lg text-slate-300 group-hover:text-white transition-colors">A recognized, startup-active campus ecosystem.</span>
                   </li>
                 </ul>
@@ -196,13 +211,17 @@ export default function LandingPage() {
             
             <div className="space-y-6">
               {[
-                { icon: Target, title: "Goal Oriented", desc: "Want to build real startups before graduation.", color: "blue" },
-                { icon: Clock, title: "Committed", desc: "Willing to prioritize consistent progress every week.", color: "indigo" },
-                { icon: Zap, title: "Action Takers", desc: "Ready for accountability and rapid execution.", color: "violet" }
+                { icon: Target, title: "Goal Oriented", desc: "Want to build real startups before graduation.", color: "blue", animation: { rotate: [0, 10, 0, -10, 0], transition: { duration: 4, repeat: Infinity, ease: "easeInOut" } } },
+                { icon: Clock, title: "Committed", desc: "Willing to prioritize consistent progress every week.", color: "indigo", animation: { rotate: [0, 15, 0, -15, 0], transition: { duration: 3, repeat: Infinity, ease: "easeInOut" } } },
+                { icon: Zap, title: "Action Takers", desc: "Ready for accountability and rapid execution.", color: "violet", animation: { scale: [1, 1.2, 1], opacity: [1, 0.8, 1], transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" } } }
               ].map((item, i) => (
                 <div key={i} className="flex gap-6 group">
                   <div className={`w-14 h-14 bg-gradient-to-br from-${item.color}-500/20 to-${item.color}-600/20 border border-${item.color}-500/30 text-${item.color}-400 flex items-center justify-center rounded-2xl shrink-0 group-hover:scale-110 transition-transform duration-300`}>
-                    <item.icon className="w-7 h-7" />
+                    <motion.div
+                      animate={item.animation}
+                    >
+                      <item.icon className="w-7 h-7" />
+                    </motion.div>
                   </div>
                   <div>
                     <h4 className="text-xl font-bold mb-1 text-white group-hover:text-indigo-300 transition-colors">{item.title}</h4>
@@ -332,10 +351,22 @@ export default function LandingPage() {
             
             <div className="flex flex-col md:flex-row justify-center gap-8 text-sm font-mono text-slate-400 mb-12">
               <span className="flex items-center gap-2 justify-center">
-                <Users className="w-4 h-4 text-indigo-400" /> LIMITED SEATS
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Users className="w-4 h-4 text-indigo-400" />
+                </motion.div>
+                 LIMITED SEATS
               </span>
               <span className="flex items-center gap-2 justify-center">
-                <Target className="w-4 h-4 text-indigo-400" /> SELECTION-BASED ENTRY
+                <motion.div
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                >
+                  <Target className="w-4 h-4 text-indigo-400" />
+                </motion.div>
+                 SELECTION-BASED ENTRY
               </span>
             </div>
             
@@ -519,15 +550,23 @@ export default function LandingPage() {
               href={INSTAGRAM_LINK}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-pink-500 hover:bg-white/10 hover:border-pink-500/50 transition-all duration-300"
+              className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-pink-500 hover:bg-white/10 hover:border-pink-500/50 transition-all duration-300 group"
             >
-              <Instagram className="w-6 h-6" />
+              <motion.div
+                whileHover={{ rotate: 15, scale: 1.1 }}
+              >
+                <Instagram className="w-6 h-6" />
+              </motion.div>
             </a>
             <a 
               href="mailto:riet.ecell@gmail.com"
-              className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/30 transition-all duration-300"
+              className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/30 transition-all duration-300 group"
             >
-              <ExternalLink className="w-6 h-6" />
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+              >
+                <Mail className="w-6 h-6" />
+              </motion.div>
             </a>
           </div>
 
