@@ -110,7 +110,7 @@ export default function LandingPage() {
               
               <div className="pl-8 relative">
                 <div className="absolute left-[-4px] top-2 w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]"></div>
-                <h3 className="text-sm font-mono uppercase text-indigo-400 mb-4 tracking-wider font-semibold">3-Year Vision</h3>
+                <h3 className="text-sm font-mono uppercase text-indigo-400 mb-4 tracking-wider font-semibold">1-Year Vision</h3>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3 group">
                     <CheckCircle className="w-6 h-6 mt-0.5 text-slate-500 group-hover:text-indigo-400 transition-colors" />
