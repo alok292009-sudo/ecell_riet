@@ -1,10 +1,11 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight, CheckCircle, Clock, Target, Users, Zap, ChevronRight, ExternalLink, Phone, MessageCircle, Instagram, Quote, Mail, Lightbulb, Globe, User, Calendar, DollarSign, AlertCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle, Clock, Target, Users, Zap, ChevronRight, ExternalLink, Phone, MessageCircle, Instagram, Quote, Mail, Lightbulb, Globe, User, Calendar, DollarSign, AlertCircle, Linkedin } from 'lucide-react';
 
 const GOOGLE_FORM_LINK = "https://docs.google.com/forms/d/e/1FAIpQLSdKRM7wXrG_F-mQyrAdKOM6A8FRKgH3ydPtQXiWaf3u01L0JQ/viewform?usp=publish-editor";
 const INSTAGRAM_LINK = "https://www.instagram.com/ecell_riet?igsh=MThvZHdlOThwbXJxeQ==";
 const WHATSAPP_GROUP_LINK = "https://chat.whatsapp.com/ENTpUc2WWwiLRuabTSoRVj/";
+const LINKEDIN_LINK = "https://www.linkedin.com/in/ecell-riet?utm_source=share_via&utm_content=profile&utm_medium=member_android";
 
 interface FadeInProps {
   children: React.ReactNode;
@@ -499,20 +500,6 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-2xl font-bold mb-1 text-white">Avani Ma'am</h3>
                 <p className="text-pink-400 font-mono text-sm mb-8 tracking-widest uppercase">Faculty Advisor</p>
-                
-                <div className="flex flex-col gap-4 items-center">
-                  <a href="tel:7891506418" className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/5 w-full justify-center">
-                    <Phone className="w-4 h-4" /> +91 78915 06418
-                  </a>
-                  <a 
-                    href="https://wa.me/917891506418" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-[#25D366] text-white px-6 py-3 rounded-full text-sm font-bold hover:bg-[#20bd5a] transition-all shadow-lg shadow-green-900/20 w-full justify-center"
-                  >
-                    <WhatsAppIcon className="w-5 h-5" /> Chat on WhatsApp
-                  </a>
-                </div>
               </div>
             </div>
           </FadeIn>
@@ -528,20 +515,6 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-2xl font-bold mb-1 text-white">Dulari Ma'am</h3>
                 <p className="text-rose-400 font-mono text-sm mb-8 tracking-widest uppercase">Faculty Advisor</p>
-                
-                <div className="flex flex-col gap-4 items-center">
-                  <a href="tel:8094559777" className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/5 w-full justify-center">
-                    <Phone className="w-4 h-4" /> +91 80945 59777
-                  </a>
-                  <a 
-                    href="https://wa.me/918094559777" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-[#25D366] text-white px-6 py-3 rounded-full text-sm font-bold hover:bg-[#20bd5a] transition-all shadow-lg shadow-green-900/20 w-full justify-center"
-                  >
-                    <WhatsAppIcon className="w-5 h-5" /> Chat on WhatsApp
-                  </a>
-                </div>
               </div>
             </div>
           </FadeIn>
@@ -580,6 +553,18 @@ export default function LandingPage() {
                 whileHover={{ scale: 1.1, rotate: -10 }}
               >
                 <WhatsAppIcon className="w-6 h-6" />
+              </motion.div>
+            </a>
+            <a 
+              href={LINKEDIN_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-blue-500 hover:bg-white/10 hover:border-blue-500/50 transition-all duration-300 group"
+            >
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 10 }}
+              >
+                <Linkedin className="w-6 h-6" />
               </motion.div>
             </a>
             <a 
