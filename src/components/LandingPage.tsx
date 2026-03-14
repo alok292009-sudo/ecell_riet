@@ -1,6 +1,6 @@
-import React from 'react';
-import { motion } from 'motion/react';
-import { ArrowRight, CheckCircle, Clock, Target, Users, Zap, ChevronRight, ExternalLink, Phone, MessageCircle, Instagram, Quote, Mail, Lightbulb, Globe, User, Calendar, DollarSign, AlertCircle, Linkedin } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
+import { ArrowRight, CheckCircle, Clock, Target, Users, Zap, ChevronRight, ExternalLink, Phone, MessageCircle, Instagram, Quote, Mail, Lightbulb, Globe, User, Calendar, DollarSign, AlertCircle, Linkedin, ChevronDown, Info } from 'lucide-react';
 
 const GOOGLE_FORM_LINK = "https://docs.google.com/forms/d/e/1FAIpQLSdKRM7wXrG_F-mQyrAdKOM6A8FRKgH3ydPtQXiWaf3u01L0JQ/viewform?usp=publish-editor";
 const INSTAGRAM_LINK = "https://www.instagram.com/ecell_riet?igsh=MThvZHdlOThwbXJxeQ==";
@@ -31,6 +31,76 @@ const FadeIn: React.FC<FadeInProps> = ({ children, delay = 0, className = "" }) 
   </motion.div>
 );
 
+interface FAQItemProps {
+  faq: {
+    icon: React.ElementType;
+    q: string;
+    a: string;
+  };
+  index: number;
+}
+
+const FAQItem: React.FC<FAQItemProps> = ({ faq, index }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <FadeIn delay={index * 0.1}>
+      <motion.div 
+        layout
+        transition={{ layout: { duration: 0.3, ease: "easeInOut" } }}
+        onClick={() => setIsOpen(!isOpen)}
+        whileHover={{ y: -5, borderColor: "rgba(99, 102, 241, 0.5)" }}
+        className={`bg-slate-900/40 p-8 rounded-2xl border ${isOpen ? 'border-indigo-500/50 bg-slate-800/40' : 'border-slate-800'} transition-colors duration-300 cursor-pointer overflow-hidden relative`}
+      >
+        <motion.div layout="position" className="flex items-start gap-4 mb-3 relative z-10">
+          <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 shrink-0">
+            <motion.div
+              animate={{ scale: [1, 1.15, 1], opacity: [0.8, 1, 0.8] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 }}
+            >
+              <faq.icon className="w-5 h-5" />
+            </motion.div>
+          </div>
+          <h3 className={`text-lg font-bold pt-1 flex-1 transition-colors ${isOpen ? 'text-indigo-300' : 'text-indigo-200'}`}>{faq.q}</h3>
+          <motion.div
+            animate={{ rotate: isOpen ? 180 : 0 }}
+            transition={{ duration: 0.3 }}
+            className="text-slate-500 mt-1"
+          >
+            <ChevronDown className="w-5 h-5" />
+          </motion.div>
+        </motion.div>
+        <AnimatePresence initial={false} mode="sync">
+          {isOpen && (
+            <motion.div
+              key="content"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="overflow-hidden"
+            >
+              <p className="text-slate-400 leading-relaxed pl-[52px] pt-2">{faq.a}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </FadeIn>
+  );
+};
+
+const SectionTitle = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
+  <motion.h2
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-20px" }}
+    transition={{ duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] }}
+    className={className}
+  >
+    {children}
+  </motion.h2>
+);
+
 const Section = ({ className, children, id }: { className?: string; children: React.ReactNode; id?: string }) => (
   <motion.section
     id={id}
@@ -45,16 +115,75 @@ const Section = ({ className, children, id }: { className?: string; children: Re
 );
 
 export default function LandingPage() {
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 500], [0, 200]);
+  const y2 = useTransform(scrollY, [0, 500], [0, -150]);
+  const [hoveredGraphPoint, setHoveredGraphPoint] = useState<number | null>(null);
+
+  const graphPoints = [
+    { x: 50, y: 250, label: "Day 1", desc: "The Idea Phase. Excitement is high, but validation is zero." },
+    { x: 130, y: 270, label: "The Trough", desc: "The 'Valley of Death'. Most give up here. Real builders persist." },
+    { x: 230, y: 150, label: "Product-Market Fit", desc: "Traction begins. The market pulls the product out of you." },
+    { x: 360, y: 50, label: "Unicorn Status", desc: "Asymmetric Advantage achieved. Market dominance." }
+  ];
+
+  const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#030712] text-slate-200 font-sans selection:bg-indigo-500/30 selection:text-indigo-200 overflow-x-hidden">
+    <div className="min-h-screen bg-[#030712] text-slate-200 font-sans selection:bg-indigo-500/30 selection:text-indigo-200 overflow-x-hidden !scroll-smooth">
       
       {/* 1. HERO SECTION */}
       <header className="relative min-h-screen flex flex-col justify-center px-6 md:px-12 max-w-7xl mx-auto">
         {/* Immersive Background */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-indigo-900/20 rounded-full blur-[120px] opacity-40"></div>
-          <div className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-blue-900/10 rounded-full blur-[100px] opacity-20"></div>
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <motion.div style={{ y: y1 }} className="absolute inset-0 will-change-transform">
+            <motion.div 
+              animate={{ scale: [1, 1.05, 1], opacity: [0.2, 0.3, 0.2] }}
+              transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-indigo-900/20 rounded-full blur-[80px]"
+            ></motion.div>
+          </motion.div>
+          
+          <motion.div style={{ y: y2 }} className="absolute inset-0 will-change-transform">
+            <motion.div 
+              animate={{ x: [0, 30, 0], y: [0, -30, 0], opacity: [0.1, 0.2, 0.1] }}
+              transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-blue-900/10 rounded-full blur-[80px]"
+            ></motion.div>
+          </motion.div>
+          
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay"></div>
+          
+          {/* Floating Particles */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[...Array(2)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute bg-indigo-400 rounded-full opacity-20 will-change-transform"
+                style={{
+                  width: Math.random() * 3 + 1 + "px",
+                  height: Math.random() * 3 + 1 + "px",
+                  top: Math.random() * 100 + "%",
+                  left: Math.random() * 100 + "%",
+                }}
+                animate={{
+                  y: [0, -10, 0],
+                }}
+                transition={{
+                  duration: Math.random() * 8 + 8,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: Math.random() * 2,
+                }}
+              />
+            ))}
+          </div>
         </div>
 
         <FadeIn>
@@ -73,8 +202,8 @@ export default function LandingPage() {
             </span>
           </h1>
           
-          <p className="text-xl md:text-2xl max-w-2xl font-light text-slate-400 mb-4 tracking-wide">
-            Rajasthan Institute of Engineering & Technology, Jaipur
+          <p className="text-xl md:text-2xl max-w-3xl font-light text-slate-300 mb-8 tracking-wide italic">
+            "Great companies don’t start with funding. They start with disciplined builders."
           </p>
           
           <p className="text-lg text-slate-500 max-w-xl mb-12 leading-relaxed border-l-2 border-indigo-500/30 pl-6">
@@ -83,21 +212,31 @@ export default function LandingPage() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4">
-            <a 
+            <motion.a 
               href={GOOGLE_FORM_LINK}
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center justify-center gap-3 bg-gradient-to-r from-indigo-600 to-blue-700 text-white px-8 py-4 rounded-full text-lg font-bold hover:from-indigo-500 hover:to-blue-600 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(79,70,229,0.5)] border border-white/10"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="group inline-flex items-center justify-center gap-3 bg-gradient-to-r from-indigo-600 to-blue-700 text-white px-8 py-4 rounded-full text-lg font-bold hover:from-indigo-500 hover:to-blue-600 transition-all duration-300 shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_30px_rgba(79,70,229,0.6)] border border-white/10"
             >
-              JOIN NOW
-              <ExternalLink className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </a>
-            <a 
-              href="#contact"
+              Join E-cell
+              <motion.div
+                animate={{ x: [0, 3, 0], y: [0, -3, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <ExternalLink className="w-5 h-5" />
+              </motion.div>
+            </motion.a>
+            <motion.a 
+              href="#how-it-works"
+              onClick={(e) => handleSmoothScroll(e, 'how-it-works')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full text-lg font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-all border border-slate-700 hover:border-slate-500"
             >
-              Contact Us
-            </a>
+              Explore the Program
+            </motion.a>
           </div>
         </FadeIn>
       </header>
@@ -106,12 +245,14 @@ export default function LandingPage() {
       <Section className="relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-950/20 to-transparent -z-10 blur-3xl"></div>
         <div className="grid md:grid-cols-2 gap-16 items-center">
-          <FadeIn>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6 text-white">Our Mission</h2>
-            <p className="text-2xl md:text-3xl font-light leading-relaxed text-slate-300">
-              Build <span className="text-indigo-400 font-normal">execution-ready founders</span> from RIET.
-            </p>
-          </FadeIn>
+          <div>
+            <SectionTitle className="text-4xl md:text-5xl font-bold tracking-tight mb-6 text-white">Our Mission</SectionTitle>
+            <FadeIn delay={0.2}>
+              <p className="text-2xl md:text-3xl font-light leading-relaxed text-slate-300">
+                We build founders who can <span className="text-indigo-400 font-normal">identify real problems</span>, validate ideas with discipline, and execute with accountability.
+              </p>
+            </FadeIn>
+          </div>
           <FadeIn delay={0.2}>
             <div className="space-y-10 relative">
               <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-indigo-500/0 via-indigo-500/50 to-indigo-500/0"></div>
@@ -160,15 +301,313 @@ export default function LandingPage() {
         </div>
       </Section>
 
+      {/* 2.5 WHY THIS MATTERS */}
+      <Section className="border-t border-slate-800/50">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <SectionTitle className="text-3xl font-bold mb-6 text-white">Why This Matters</SectionTitle>
+            <FadeIn delay={0.2}>
+              <div className="space-y-6 text-lg text-slate-400 leading-relaxed">
+                <div className="flex items-start gap-3 group relative">
+                  <p>
+                    India’s startup ecosystem is growing rapidly. Students who build early gain asymmetric advantage.
+                  </p>
+                  <div className="relative shrink-0 mt-1">
+                    <Info className="w-5 h-5 text-slate-600 hover:text-indigo-400 cursor-help transition-colors" />
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-300 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
+                      India has over 100 unicorns and is the 3rd largest startup ecosystem globally.
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-800"></div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3 group relative">
+                  <p>
+                    Campuses that build companies outperform those that only place graduates.
+                  </p>
+                  <div className="relative shrink-0 mt-1">
+                    <Info className="w-5 h-5 text-slate-600 hover:text-indigo-400 cursor-help transition-colors" />
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-300 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
+                      Top institutes like IITs and BITS are defined by their alumni founders, not just placements.
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-800"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-xl text-indigo-300 font-medium border-l-2 border-indigo-500 pl-4">
+                  "RIET must not only prepare students for jobs. It must prepare them to create them."
+                </p>
+              </div>
+            </FadeIn>
+          </div>
+          <FadeIn delay={0.2}>
+             <div className="relative h-full min-h-[350px] rounded-2xl overflow-hidden bg-slate-900/30 border border-slate-800 group">
+                {/* Dynamic Background Effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-blue-500/5"></div>
+                <motion.div 
+                  className="absolute -top-20 -right-20 w-64 h-64 bg-indigo-500/20 rounded-full blur-[80px]"
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <motion.div 
+                  className="absolute -bottom-20 -left-20 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px]"
+                  animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.5, 0.2] }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                />
+                
+                {/* Grid Background */}
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_80%)]"></div>
+
+                {/* Graph Visualization */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity duration-700">
+                   <svg width="100%" height="100%" viewBox="0 0 400 320" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
+                      <defs>
+                        <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#6366f1" stopOpacity="0.5" />
+                          <stop offset="40%" stopColor="#818cf8" stopOpacity="1" />
+                          <stop offset="100%" stopColor="#a5b4fc" stopOpacity="1" />
+                        </linearGradient>
+                        <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" stopColor="#6366f1" stopOpacity="0.15" />
+                          <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+                        </linearGradient>
+                        <filter id="glow">
+                          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                          <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                          </feMerge>
+                        </filter>
+                      </defs>
+
+                      {/* Axes */}
+                      <line x1="50" y1="280" x2="360" y2="280" stroke="rgba(148, 163, 184, 0.3)" strokeWidth="1" />
+                      <line x1="50" y1="280" x2="50" y2="40" stroke="rgba(148, 163, 184, 0.3)" strokeWidth="1" />
+                      
+                      {/* Grid Lines */}
+                      <line x1="50" y1="220" x2="360" y2="220" stroke="rgba(148, 163, 184, 0.05)" strokeWidth="1" />
+                      <line x1="50" y1="160" x2="360" y2="160" stroke="rgba(148, 163, 184, 0.05)" strokeWidth="1" />
+                      <line x1="50" y1="100" x2="360" y2="100" stroke="rgba(148, 163, 184, 0.05)" strokeWidth="1" />
+                      
+                      {/* Standard Path (Linear Career) */}
+                      <motion.path
+                        d="M 50 250 L 360 180"
+                        fill="transparent"
+                        stroke="rgba(255, 255, 255, 0.15)"
+                        strokeWidth="2"
+                        strokeDasharray="6 6"
+                        initial={{ pathLength: 0 }}
+                        whileInView={{ pathLength: 1 }}
+                        transition={{ duration: 1.5, ease: "linear" }}
+                      />
+
+                      {/* Founder Path (J-Curve) */}
+                      {/* Path definition: Start(50,250) -> Dip(130,310) -> Rise(220,150) -> Peak(360,50) */}
+                      
+                      {/* Area under the curve */}
+                      <motion.path
+                        d="M 50 250 C 90 250 130 290 190 230 C 250 170 290 50 360 50 L 360 280 L 50 280 Z"
+                        fill="url(#areaGradient)"
+                        stroke="none"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        transition={{ duration: 1, delay: 0.5 }}
+                      />
+
+                      {/* The J-Curve Line */}
+                      <motion.path
+                        d="M 50 250 C 90 250 130 290 190 230 C 250 170 290 50 360 50"
+                        fill="transparent"
+                        stroke="url(#lineGradient)"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                        filter="url(#glow)"
+                        initial={{ pathLength: 0, opacity: 0.5 }}
+                        whileInView={{ pathLength: 1, opacity: 1 }}
+                        transition={{ duration: 2, ease: "easeInOut", delay: 0.2 }}
+                      />
+                      
+                      {/* Valley of Death Marker */}
+                      <motion.circle
+                        cx="130" cy="270" r="3"
+                        fill="#ef4444"
+                        initial={{ scale: 0 }}
+                        whileInView={{ scale: 1 }}
+                        transition={{ delay: 1.2 }}
+                      />
+
+                      {/* Moving Particle */}
+                      <circle r="4" fill="#fff" filter="url(#glow)">
+                        <animateMotion
+                           dur="3s"
+                           repeatCount="indefinite"
+                           path="M 50 250 C 90 250 130 290 190 230 C 250 170 290 50 360 50"
+                           calcMode="spline"
+                           keyTimes="0;1"
+                           keySplines="0.4 0 0.2 1"
+                        />
+                        <animate attributeName="r" values="4;5;4" dur="1s" repeatCount="indefinite" />
+                      </circle>
+                      
+                      {/* Advantage Gap Line */}
+                      <motion.line
+                        x1="360" y1="180" x2="360" y2="60"
+                        stroke="#818cf8"
+                        strokeWidth="1"
+                        strokeDasharray="4 4"
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        whileInView={{ pathLength: 1, opacity: 0.5 }}
+                        transition={{ delay: 2.2, duration: 1 }}
+                      />
+
+                      {/* Advantage Label with Tooltip */}
+                      <g className="group/tooltip">
+                        <motion.text
+                          x="350" y="120"
+                          textAnchor="end"
+                          fill="#818cf8"
+                          fontSize="11"
+                          fontWeight="bold"
+                          fontFamily="monospace"
+                          initial={{ opacity: 0, y: 10 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 2.5, duration: 1 }}
+                          className="cursor-help"
+                        >
+                          Asymmetric Advantage
+                        </motion.text>
+                        {/* Hit area */}
+                        <rect x="200" y="105" width="160" height="20" fill="transparent" className="cursor-help" />
+                        
+                        <foreignObject x="150" y="30" width="220" height="100" className="opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-300 pointer-events-none">
+                          <div xmlns="http://www.w3.org/1999/xhtml" className="w-full h-full flex items-end justify-end pb-2">
+                             <div className="bg-slate-800 border border-slate-700 rounded-lg p-3 text-[10px] leading-tight text-slate-300 shadow-xl text-center w-full relative">
+                                Early execution creates a compounding lead that credentials alone cannot match.
+                                <div className="absolute top-full right-8 -mt-1 border-4 border-transparent border-t-slate-800"></div>
+                             </div>
+                          </div>
+                        </foreignObject>
+                      </g>
+                      
+                      {/* End Marker (Unicorn) */}
+                      <motion.g
+                        initial={{ scale: 0 }}
+                        whileInView={{ scale: 1 }}
+                        transition={{ delay: 2.2, type: "spring" }}
+                      >
+                        <motion.circle 
+                          cx="360" cy="50" r="6" 
+                          fill="#818cf8" 
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        />
+                        <motion.circle 
+                          cx="360" cy="50" r="12" 
+                          stroke="#818cf8" strokeWidth="1" fill="none"
+                          animate={{ scale: [1, 2.5], opacity: [0.8, 0] }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                        />
+                        <motion.circle 
+                          cx="360" cy="50" r="12" 
+                          stroke="#818cf8" strokeWidth="1" fill="none"
+                          animate={{ scale: [1, 4], opacity: [0.6, 0] }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 0.6 }}
+                        />
+                      </motion.g>
+                      {/* Interactive Data Points */}
+                      {graphPoints.map((point, index) => (
+                        <g 
+                          key={index} 
+                          onMouseEnter={() => setHoveredGraphPoint(index)}
+                          onMouseLeave={() => setHoveredGraphPoint(null)}
+                          className="cursor-pointer"
+                        >
+                          {/* Visible Dot (only if not already visually represented by complex markers) */}
+                          {index !== 3 && (
+                            <motion.circle
+                              cx={point.x}
+                              cy={point.y}
+                              r="4"
+                              fill="#0f172a"
+                              stroke={index === 1 ? "#ef4444" : "#818cf8"}
+                              strokeWidth="2"
+                              initial={{ scale: 0 }}
+                              whileInView={{ scale: 1 }}
+                              transition={{ delay: 1 + index * 0.2 }}
+                              whileHover={{ scale: 1.5 }}
+                            />
+                          )}
+                          
+                          {/* Invisible Hit Area */}
+                          <circle cx={point.x} cy={point.y} r="15" fill="transparent" />
+                        </g>
+                      ))}
+
+                      {/* Tooltip Overlay */}
+                      <AnimatePresence>
+                        {hoveredGraphPoint !== null && (
+                          <foreignObject 
+                            x={graphPoints[hoveredGraphPoint].x - 100} 
+                            y={graphPoints[hoveredGraphPoint].y - 100} 
+                            width="200" 
+                            height="100" 
+                            className="pointer-events-none overflow-visible"
+                          >
+                            <div xmlns="http://www.w3.org/1999/xhtml" className="flex flex-col items-center justify-end h-full pb-4">
+                              <motion.div
+                                initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                                className="bg-slate-900/90 backdrop-blur-md border border-slate-700 p-3 rounded-xl shadow-2xl text-center min-w-[180px]"
+                              >
+                                <h4 className={`text-xs font-bold uppercase tracking-wider mb-1 ${hoveredGraphPoint === 1 ? 'text-red-400' : 'text-indigo-400'}`}>
+                                  {graphPoints[hoveredGraphPoint].label}
+                                </h4>
+                                <p className="text-[10px] text-slate-300 leading-tight">
+                                  {graphPoints[hoveredGraphPoint].desc}
+                                </p>
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-slate-700"></div>
+                              </motion.div>
+                            </div>
+                          </foreignObject>
+                        )}
+                      </AnimatePresence>
+                   </svg>
+                </div>
+
+                {/* Content Overlay */}
+                <div className="relative z-10 p-8 flex flex-col justify-end h-full mt-20 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent">
+                   <div className="flex items-center gap-4 mb-3">
+                      <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 backdrop-blur-sm">
+                         <Zap className="w-5 h-5 text-indigo-400" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white">Asymmetric Advantage</h3>
+                   </div>
+                   <p className="text-slate-400 text-sm leading-relaxed">
+                      Building a startup is the ultimate credential. It proves you can solve problems, lead teams, and handle uncertainty—skills that standard paths don't teach.
+                   </p>
+                </div>
+             </div>
+          </FadeIn>
+        </div>
+      </Section>
+
       {/* 3. HOW IT WORKS */}
       <Section id="how-it-works">
-        <FadeIn>
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-20 text-center">From Idea to Execution</h2>
-        </FadeIn>
+        <SectionTitle className="text-4xl md:text-5xl font-bold tracking-tight mb-20 text-center">From Idea to Execution</SectionTitle>
         
         <div className="relative">
-          {/* Connecting Line */}
-          <div className="absolute left-[28px] md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-indigo-500/0 via-indigo-500/30 to-indigo-500/0 md:-translate-x-1/2"></div>
+          {/* Connecting Line Container */}
+          <div className="absolute left-[28px] md:left-1/2 top-0 bottom-0 w-px md:-translate-x-1/2 h-full bg-indigo-500/10">
+            {/* Scroll Progress Line */}
+            <motion.div
+              className="absolute top-0 left-0 w-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"
+              initial={{ height: 0 }}
+              whileInView={{ height: "100%" }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ duration: 4, ease: "linear" }}
+            />
+          </div>
 
           <div className="space-y-12">
             {[
@@ -176,30 +615,62 @@ export default function LandingPage() {
               { phase: "02", title: "Validation Sprint", desc: "Build and test an MVP with real users." },
               { phase: "03", title: "Mentorship", desc: "Weekly reviews and strategic refinement." },
               { phase: "04", title: "Demo Day", desc: "Present progress to faculty and external mentors." },
-              { phase: "05", title: "Advanced Track", desc: "Top teams continue toward traction and growth." }
+              { phase: "05", title: "Advanced Track", desc: "Top teams continue toward traction and growth." },
+              { 
+                phase: "Outcome", 
+                title: "Real Results", 
+                desc: (
+                  <>
+                    <span className="group/tooltip relative cursor-help border-b border-dashed border-slate-500 hover:border-indigo-400 hover:text-indigo-300 transition-colors inline-block">
+                      Market-validated product
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-300 shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-20 text-center">
+                        A product that real customers are willing to pay for or use repeatedly.
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-800"></div>
+                      </div>
+                    </span>
+                    . Real user traction. Investment readiness.
+                  </>
+                )
+              }
             ].map((step, i) => (
-              <FadeIn key={step.phase} delay={i * 0.1}>
-                <div className={`flex flex-col md:flex-row gap-8 items-start md:items-center ${i % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
-                  
-                  {/* Content */}
-                  <div className="flex-1 w-full md:w-auto pl-16 md:pl-0">
-                    <div className={`p-8 rounded-2xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm hover:bg-slate-800/50 hover:border-indigo-500/30 transition-all duration-500 group ${i % 2 === 0 ? 'md:text-left' : 'md:text-right'}`}>
-                      <h3 className="text-2xl font-bold mb-2 text-white group-hover:text-indigo-300 transition-colors">{step.title}</h3>
-                      <p className="text-slate-400 leading-relaxed">{step.desc}</p>
-                    </div>
-                  </div>
-
-                  {/* Center Marker */}
-                  <div className="absolute left-[4px] md:left-1/2 w-12 h-12 -translate-x-0 md:-translate-x-1/2 flex items-center justify-center">
-                    <div className="w-12 h-12 rounded-full bg-[#020617] border border-indigo-500/50 flex items-center justify-center z-10 shadow-[0_0_15px_rgba(99,102,241,0.3)]">
-                      <span className="text-xs font-mono font-bold text-indigo-400">{step.phase}</span>
-                    </div>
-                  </div>
-
-                  {/* Empty Space for alignment */}
-                  <div className="flex-1 hidden md:block"></div>
+              <div key={step.phase} className={`flex flex-col md:flex-row gap-8 items-start md:items-center ${i % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
+                
+                {/* Content */}
+                <div className="flex-1 w-full md:w-auto pl-16 md:pl-0">
+                  <motion.div 
+                    initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    whileHover={{ scale: 1.02, backgroundColor: "rgba(30, 41, 59, 0.8)" }}
+                    className={`p-8 rounded-2xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm transition-all duration-300 group ${i % 2 === 0 ? 'md:text-left' : 'md:text-right'}`}
+                  >
+                    <h3 className="text-2xl font-bold mb-2 text-white group-hover:text-indigo-300 transition-colors">{step.title}</h3>
+                    <p className="text-slate-400 leading-relaxed">{step.desc}</p>
+                  </motion.div>
                 </div>
-              </FadeIn>
+
+                {/* Center Marker */}
+                <div className="absolute left-[4px] md:left-1/2 w-12 h-12 -translate-x-0 md:-translate-x-1/2 flex items-center justify-center">
+                  <motion.div 
+                    initial={{ scale: 0, opacity: 0 }}
+                    whileInView={{ scale: 1, opacity: 1 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.4, delay: 0 }}
+                    className="w-12 h-12 rounded-full bg-[#020617] border border-indigo-500/50 flex items-center justify-center z-10 shadow-[0_0_15px_rgba(99,102,241,0.3)] relative"
+                  >
+                    <motion.div
+                      className="absolute inset-0 rounded-full border border-indigo-400/30"
+                      animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
+                      transition={{ duration: 2, repeat: Infinity, delay: i * 0.5 }}
+                    />
+                    <span className="text-xs font-mono font-bold text-indigo-400 relative z-10">{step.phase}</span>
+                  </motion.div>
+                </div>
+
+                {/* Empty Space for alignment */}
+                <div className="flex-1 hidden md:block"></div>
+              </div>
             ))}
           </div>
         </div>
@@ -211,47 +682,51 @@ export default function LandingPage() {
          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none"></div>
 
         <div className="grid md:grid-cols-2 gap-16 items-center relative z-10">
-          <FadeIn>
-            <h2 className="text-4xl font-bold tracking-tight mb-6">Who Should Apply</h2>
-            <p className="text-lg text-slate-300 mb-12 leading-relaxed">
-              This program is designed for serious builders who care about execution over certificates.
-            </p>
-            
-            <div className="space-y-6">
-              {[
-                { icon: Target, title: "Goal Oriented", desc: "Want to build real startups before graduation.", color: "blue", animation: { rotate: [0, 10, 0, -10, 0], transition: { duration: 4, repeat: Infinity, ease: "easeInOut" } } },
-                { icon: Clock, title: "Committed", desc: "Willing to prioritize consistent progress every week.", color: "indigo", animation: { rotate: [0, 15, 0, -15, 0], transition: { duration: 3, repeat: Infinity, ease: "easeInOut" } } },
-                { icon: Zap, title: "Action Takers", desc: "Ready for accountability and rapid execution.", color: "violet", animation: { scale: [1, 1.2, 1], opacity: [1, 0.8, 1], transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" } } }
-              ].map((item, i) => (
-                <div key={i} className="flex gap-6 group">
-                  <div className={`w-14 h-14 bg-gradient-to-br from-${item.color}-500/20 to-${item.color}-600/20 border border-${item.color}-500/30 text-${item.color}-400 flex items-center justify-center rounded-2xl shrink-0 group-hover:scale-110 transition-transform duration-300`}>
-                    <motion.div
-                      animate={item.animation}
-                    >
-                      <item.icon className="w-7 h-7" />
-                    </motion.div>
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-bold mb-1 text-white group-hover:text-indigo-300 transition-colors">{item.title}</h4>
-                    <p className="text-slate-400">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </FadeIn>
+          <div>
+            <SectionTitle className="text-4xl font-bold tracking-tight mb-6">Who Should Apply</SectionTitle>
+            <FadeIn delay={0.2}>
+              <p className="text-lg text-slate-300 mb-12 leading-relaxed">
+                This program is designed for serious builders who care about execution over certificates.
+              </p>
+              
+              <div className="space-y-6">
+                {[
+                  { icon: Target, title: "Goal Oriented", desc: "Want to build real startups before graduation.", color: "blue", animation: { rotate: [0, 10, 0, -10, 0], transition: { duration: 4, repeat: Infinity, ease: "easeInOut" } } },
+                  { icon: Clock, title: "Committed", desc: "Willing to prioritize consistent progress every week.", color: "indigo", animation: { rotate: [0, 15, 0, -15, 0], transition: { duration: 3, repeat: Infinity, ease: "easeInOut" } } },
+                  { icon: Zap, title: "Action Takers", desc: "Ready for accountability and rapid execution.", color: "violet", animation: { scale: [1, 1.2, 1], opacity: [1, 0.8, 1], transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" } } }
+                ].map((item, i) => (
+                  <motion.div 
+                    key={i} 
+                    whileHover={{ x: 10 }}
+                    className="flex gap-6 group cursor-default"
+                  >
+                    <div className={`w-14 h-14 bg-gradient-to-br from-${item.color}-500/20 to-${item.color}-600/20 border border-${item.color}-500/30 text-${item.color}-400 flex items-center justify-center rounded-2xl shrink-0 group-hover:scale-110 transition-transform duration-300`}>
+                      <motion.div
+                        animate={item.animation}
+                      >
+                        <item.icon className="w-7 h-7" />
+                      </motion.div>
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-bold mb-1 text-white group-hover:text-indigo-300 transition-colors">{item.title}</h4>
+                      <p className="text-slate-400">{item.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </FadeIn>
+          </div>
 
           <FadeIn delay={0.2}>
-            <div className="bg-gradient-to-br from-slate-900/80 to-black/80 backdrop-blur-md border border-red-500/20 p-8 md:p-12 rounded-3xl relative overflow-hidden shadow-2xl">
-              <div className="absolute -right-10 -top-10 w-40 h-40 bg-red-500/10 rounded-full blur-3xl"></div>
+            <div className="bg-slate-900/50 backdrop-blur-md border border-slate-800 p-8 md:p-12 rounded-3xl relative overflow-hidden shadow-2xl">
               
-              <h3 className="text-2xl font-bold mb-8 text-red-400 flex items-center gap-3">
-                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-red-500/10 border border-red-500/30 text-sm">!</span>
-                What this is NOT:
+              <h3 className="text-2xl font-bold mb-8 text-slate-200 flex items-center gap-3">
+                This Program Is Not Designed For:
               </h3>
-              <ul className="space-y-6 font-medium text-slate-300">
-                {["A casual club", "A passive membership", "A resume filler"].map((item, i) => (
+              <ul className="space-y-6 font-medium text-slate-400">
+                {["Passive membership", "Attendance-based participation", "Certificate collection"].map((item, i) => (
                   <li key={i} className="flex items-center gap-4">
-                    <span className="w-1.5 h-1.5 bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.8)]"></span>
+                    <span className="w-1.5 h-1.5 bg-slate-500 rounded-full"></span>
                     <span className="text-lg">{item}</span>
                   </li>
                 ))}
@@ -264,10 +739,13 @@ export default function LandingPage() {
       {/* 5. EXPECTATIONS */}
       <Section className="border-y border-slate-800 bg-slate-900/20">
         <div className="max-w-3xl mx-auto text-center mb-16">
-          <FadeIn>
-            <h2 className="text-3xl font-bold mb-4 text-white">Expectations & Accountability</h2>
-            <p className="text-slate-400 text-lg">We hold high standards to ensure high quality output.</p>
-          </FadeIn>
+          <div>
+            <SectionTitle className="text-3xl font-bold mb-4 text-white">Expectations & Accountability</SectionTitle>
+            <FadeIn delay={0.2}>
+              <p className="text-slate-400 text-lg">We hold high standards to ensure high quality output.</p>
+              <p className="text-indigo-400 mt-2 font-medium">"High standards are not restrictions. They are accelerators."</p>
+            </FadeIn>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -278,33 +756,72 @@ export default function LandingPage() {
             { title: "Active Status", desc: "Inactive teams may be removed." }
           ].map((item, i) => (
             <FadeIn key={i} delay={i * 0.1}>
-              <div className="bg-slate-900/40 p-8 rounded-2xl border border-slate-800 h-full hover:border-indigo-500/50 hover:bg-slate-800 transition-all duration-300 group">
+              <motion.div 
+                whileHover={{ y: -8, borderColor: "rgba(99, 102, 241, 0.5)" }}
+                className="bg-slate-900/40 p-8 rounded-2xl border border-slate-800 h-full transition-all duration-300 group"
+              >
                 <h3 className="font-bold text-lg mb-3 text-white group-hover:text-indigo-300 transition-colors">{item.title}</h3>
                 <p className="text-slate-400 leading-relaxed">{item.desc}</p>
-              </div>
+              </motion.div>
             </FadeIn>
           ))}
+        </div>
+      </Section>
+
+      {/* 5.5 OPERATING PRINCIPLES */}
+      <Section className="bg-slate-900/30 border-y border-slate-800">
+        <div>
+          <div className="text-center mb-12">
+            <SectionTitle className="text-3xl font-bold mb-4 text-white">Our Operating Principles</SectionTitle>
+            <FadeIn delay={0.2}>
+              <p className="text-slate-400">The mindset that separates builders from dreamers.</p>
+            </FadeIn>
+          </div>
+          <FadeIn delay={0.4}>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { title: "Execution over Excitement", desc: "Ideas are cheap. Execution is everything." },
+                { title: "Validation before Scaling", desc: "Don't build what nobody wants." },
+                { title: "Accountability over Attendance", desc: "Show up with progress, not just presence." },
+                { title: "Long-term over Short-term", desc: "Build for the decade, not the weekend." }
+              ].map((principle, i) => (
+                <motion.div 
+                  key={i} 
+                  whileHover={{ scale: 1.03 }}
+                  className="p-6 rounded-xl bg-slate-950 border border-slate-800 hover:border-indigo-500/40 transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center mb-4 text-indigo-400 font-bold text-lg">
+                    {i + 1}
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">{principle.title}</h3>
+                  <p className="text-sm text-slate-400">{principle.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </FadeIn>
         </div>
       </Section>
 
       {/* TESTIMONIALS SECTION */}
       <Section>
         <div className="text-center mb-16">
-          <FadeIn>
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Voices of Leadership</h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">
-              Insights from mentors and industry experts supporting the E-Cell initiative.
-            </p>
-          </FadeIn>
+          <div>
+            <SectionTitle className="text-3xl md:text-4xl font-bold mb-6">Voices of Leadership</SectionTitle>
+            <FadeIn delay={0.2}>
+              <p className="text-slate-400 max-w-2xl mx-auto">
+                Insights from mentors and industry experts supporting the E-Cell initiative.
+              </p>
+            </FadeIn>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
           {[
             {
               quote: "The structured approach of this program is exactly what early-stage student founders need to bridge the gap between idea and execution.",
-              author: "Dulari Ma'am & Avani Ma'am",
-              role: "Faculty Advisors",
-              initials: "DA"
+              author: "Dulari Ma'am",
+              role: "Mentor",
+              initials: "DM"
             },
             {
               quote: "E-Cell RIET is creating a culture of innovation that will define the next decade of the institute. This is where the future is built.",
@@ -320,16 +837,22 @@ export default function LandingPage() {
             }
           ].map((item, i) => (
             <FadeIn key={i} delay={i * 0.1}>
-              <div className="bg-slate-900/40 border border-slate-800 p-8 rounded-2xl relative h-full hover:bg-slate-800/60 transition-colors">
-                <Quote className="w-10 h-10 text-indigo-500/20 absolute top-6 right-6" />
-                <p className="text-slate-300 mb-8 leading-relaxed relative z-10">"{item.quote}"</p>
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-indigo-900/30 border border-indigo-500/30 flex items-center justify-center text-indigo-300 font-bold text-sm">
+              <div className="bg-slate-900/40 border border-slate-800 p-8 rounded-2xl relative h-full hover:bg-slate-800/60 transition-colors flex flex-col">
+                <motion.div 
+                  className="absolute top-6 right-6"
+                  animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.3, 0.2] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <Quote className="w-10 h-10 text-indigo-500" />
+                </motion.div>
+                <p className="text-slate-300 mb-8 leading-relaxed relative z-10 flex-grow italic">"{item.quote}"</p>
+                <div className="flex items-center gap-3 pt-4 border-t border-white/5">
+                  <div className="w-8 h-8 rounded-full bg-indigo-900/30 border border-indigo-500/30 flex items-center justify-center text-indigo-300 font-bold text-xs shrink-0">
                     {item.initials}
                   </div>
                   <div>
-                    <h4 className="font-bold text-white text-sm">{item.author}</h4>
-                    <p className="text-xs text-indigo-400">{item.role}</p>
+                    <h4 className="font-bold text-white text-sm leading-tight">{item.author}</h4>
+                    <p className="text-[10px] text-indigo-400 uppercase tracking-wider">{item.role}</p>
                   </div>
                 </div>
               </div>
@@ -342,81 +865,93 @@ export default function LandingPage() {
       <Section className="relative">
         <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/30 to-slate-950 rounded-3xl border border-slate-800 overflow-hidden">
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.1),transparent_70%)]"></div>
+          <motion.div 
+            animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.15),transparent_70%)]"
+          ></motion.div>
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 via-transparent to-transparent"
+            animate={{ opacity: [0, 0.3, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
         </div>
         
         <div className="text-center py-20 relative z-10 px-6">
-          <FadeIn>
-            <div className="inline-block border border-indigo-400/30 bg-indigo-500/10 px-6 py-2 rounded-full text-sm font-mono text-indigo-300 mb-8 shadow-[0_0_20px_rgba(99,102,241,0.15)]">
-              BATCH 01 • APPLICATIONS OPEN
-            </div>
-            <h2 className="text-5xl md:text-7xl font-bold mb-8 tracking-tight text-white drop-shadow-2xl">
+          <div>
+            <FadeIn>
+              <div className="inline-block border border-indigo-400/30 bg-indigo-500/10 px-6 py-2 rounded-full text-sm font-mono text-indigo-300 mb-8 shadow-[0_0_20px_rgba(99,102,241,0.15)]">
+                BATCH 01 • APPLICATIONS OPEN
+              </div>
+            </FadeIn>
+            <SectionTitle className="text-5xl md:text-7xl font-bold mb-8 tracking-tight text-white drop-shadow-2xl">
               Founding Cohort
-            </h2>
-            <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-12 leading-relaxed font-light">
-              The first builders. The culture setters. <br/>The ones who define RIET’s startup future.
-            </p>
-            
-            <div className="flex flex-col md:flex-row justify-center gap-8 text-sm font-mono text-slate-400 mb-12">
-              <span className="flex items-center gap-2 justify-center">
+            </SectionTitle>
+            <FadeIn delay={0.2}>
+              <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-12 leading-relaxed font-light">
+                The first builders. The culture setters. <br/>The ones who define RIET’s startup future.
+              </p>
+              
+              <div className="flex flex-col md:flex-row justify-center gap-8 text-sm font-mono text-slate-400 mb-8">
+                <span className="flex items-center gap-2 justify-center">
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <Users className="w-4 h-4 text-indigo-400" />
+                  </motion.div>
+                   LIMITED SEATS
+                </span>
+                <span className="flex items-center gap-2 justify-center">
+                  <motion.div
+                    animate={{ rotate: [0, 360] }}
+                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                  >
+                    <Target className="w-4 h-4 text-indigo-400" />
+                  </motion.div>
+                   SELECTION-BASED ENTRY
+                </span>
+              </div>
+
+              <p className="text-slate-500 text-sm max-w-lg mx-auto mb-12 italic">
+                "A small cohort ensures focused mentorship and measurable progress."
+              </p>
+              
+              <motion.a 
+                href={GOOGLE_FORM_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center gap-3 bg-gradient-to-r from-indigo-600 to-blue-700 text-white px-10 py-5 rounded-full text-xl font-bold hover:from-indigo-500 hover:to-blue-600 transition-all duration-300 shadow-[0_0_30px_rgba(79,70,229,0.4)] hover:shadow-[0_0_40px_rgba(79,70,229,0.6)] border border-white/10"
+              >
+                JOIN NOW
                 <motion.div
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+                  animate={{ x: [0, 5, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  <Users className="w-4 h-4 text-indigo-400" />
+                  <ArrowRight className="w-6 h-6" />
                 </motion.div>
-                 LIMITED SEATS
-              </span>
-              <span className="flex items-center gap-2 justify-center">
-                <motion.div
-                  animate={{ rotate: [0, 360] }}
-                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                >
-                  <Target className="w-4 h-4 text-indigo-400" />
-                </motion.div>
-                 SELECTION-BASED ENTRY
-              </span>
-            </div>
-            
-            <a 
-              href={GOOGLE_FORM_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 bg-gradient-to-r from-indigo-600 to-blue-700 text-white px-10 py-5 rounded-full text-xl font-bold hover:from-indigo-500 hover:to-blue-600 transition-all duration-300 transform hover:scale-105 shadow-[0_0_30px_rgba(79,70,229,0.4)] border border-white/10"
-            >
-              JOIN NOW
-              <ArrowRight className="w-6 h-6" />
-            </a>
-          </FadeIn>
+              </motion.a>
+            </FadeIn>
+          </div>
         </div>
       </Section>
 
       {/* FAQ SECTION */}
       <Section>
-        <FadeIn>
-          <h2 className="text-4xl font-bold tracking-tight mb-12 text-white">Frequently Asked Questions</h2>
-        </FadeIn>
+        <SectionTitle className="text-4xl font-bold tracking-tight mb-12 text-white">Frequently Asked Questions</SectionTitle>
         
         <div className="grid md:grid-cols-2 gap-x-12 gap-y-10">
           {[
             { icon: Lightbulb, q: "Do I need a fully formed startup idea?", a: "You need a clear problem statement. Phase 1 is dedicated to validating that problem. You don't need a full business plan yet, but you must have a direction." },
             { icon: Globe, q: "Is this open to all branches?", a: "Yes. We believe great founders come from every discipline. We actively encourage cross-disciplinary teams." },
             { icon: User, q: "Can I apply as a solo founder?", a: "Yes. While teams can execute faster, solo founders with high drive are welcome. You might even find potential co-founders within the cohort." },
-            { icon: Calendar, q: "What is the time commitment?", a: "Enough to build something real. This program demands consistent execution, weekly reviews, and measurable progress." },
+            { icon: Calendar, q: "What is the time commitment?", a: "Consistent execution, weekly reviews, and measurable progress are expected." },
             { icon: DollarSign, q: "Does the program provide funding?", a: "We focus on making you investment-ready. Top teams from the Advanced Track will have opportunities to pitch to external investors and VCs." },
             { icon: AlertCircle, q: "What if I miss the weekly reviews?", a: "Attendance is mandatory. This program is modeled after high-performance accelerators. Inactive or absent teams will be removed." }
           ].map((faq, i) => (
-            <FadeIn key={i} delay={i * 0.1}>
-              <div className="bg-slate-900/40 p-8 rounded-2xl border border-slate-800 h-full hover:border-indigo-500/30 transition-colors">
-                <div className="flex items-start gap-4 mb-3">
-                  <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 shrink-0">
-                    <faq.icon className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-lg font-bold text-indigo-200 pt-1">{faq.q}</h3>
-                </div>
-                <p className="text-slate-400 leading-relaxed pl-[52px]">{faq.a}</p>
-              </div>
-            </FadeIn>
+            <FAQItem key={i} faq={faq} index={i} />
           ))}
         </div>
       </Section>
@@ -424,18 +959,30 @@ export default function LandingPage() {
       {/* LEADERSHIP & CONTACT SECTION */}
       <Section id="contact" className="mb-12">
         <div className="text-center mb-16">
-          <FadeIn>
-            <h2 className="text-3xl font-bold mb-4">Leadership & Contact</h2>
-            <p className="text-slate-400">Connect with the team driving E-Cell RIET.</p>
-          </FadeIn>
+          <div>
+            <SectionTitle className="text-3xl font-bold mb-4">Leadership & Contact</SectionTitle>
+            <FadeIn delay={0.2}>
+              <p className="text-slate-400">Connect with the team driving E-Cell RIET.</p>
+            </FadeIn>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {/* Founder 1 */}
           <FadeIn delay={0.1}>
-            <div className="bg-gradient-to-b from-white/[0.05] to-transparent p-10 rounded-3xl border border-white/10 hover:border-indigo-500/50 transition-all duration-300 text-center group relative overflow-hidden h-full">
+            <motion.div 
+              whileHover={{ y: -10 }}
+              className="bg-gradient-to-b from-white/[0.05] to-transparent p-10 rounded-3xl border border-white/10 hover:border-indigo-500/50 transition-colors duration-300 text-center group relative overflow-hidden h-full"
+            >
               <div className="absolute inset-0 bg-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
               
+              {/* Pulsing Background */}
+              <motion.div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-indigo-500/20 rounded-full blur-[60px]"
+                animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.5, 0.2] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              />
+
               <div className="relative z-10">
                 <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full mx-auto mb-6 flex items-center justify-center text-3xl font-bold text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] group-hover:scale-110 transition-transform duration-300">
                   AG
@@ -444,27 +991,43 @@ export default function LandingPage() {
                 <p className="text-indigo-400 font-mono text-sm mb-8 tracking-widest uppercase">Founder</p>
                 
                 <div className="flex flex-col gap-4 items-center">
-                  <a href="tel:9451901542" className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/5 w-full justify-center">
-                    <Phone className="w-4 h-4" /> 9451901542
+                  <a href="tel:9451901542" className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/5 w-full justify-center group">
+                    <motion.div whileHover={{ scale: 1.2 }} transition={{ duration: 0.2 }}>
+                      <Phone className="w-5 h-5" />
+                    </motion.div>
+                    9451901542
                   </a>
                   <a 
                     href="https://wa.me/919451901542" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-[#25D366] text-white px-6 py-3 rounded-full text-sm font-bold hover:bg-[#20bd5a] transition-all shadow-lg shadow-green-900/20 w-full justify-center"
+                    className="flex items-center gap-2 bg-slate-900 border border-slate-700 text-white px-6 py-3 rounded-full text-sm font-bold hover:bg-slate-800 hover:border-indigo-500 transition-all shadow-lg shadow-indigo-900/10 w-full justify-center group"
                   >
-                    <WhatsAppIcon className="w-5 h-5" /> Chat on WhatsApp
+                    <motion.div whileHover={{ scale: 1.2 }}>
+                      <WhatsAppIcon className="w-5 h-5 text-green-500" />
+                    </motion.div>
+                    Chat on WhatsApp
                   </a>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </FadeIn>
 
           {/* Founder 2 */}
           <FadeIn delay={0.2}>
-            <div className="bg-gradient-to-b from-white/[0.05] to-transparent p-10 rounded-3xl border border-white/10 hover:border-indigo-500/50 transition-all duration-300 text-center group relative overflow-hidden h-full">
+            <motion.div 
+              whileHover={{ y: -10 }}
+              className="bg-gradient-to-b from-white/[0.05] to-transparent p-10 rounded-3xl border border-white/10 hover:border-indigo-500/50 transition-colors duration-300 text-center group relative overflow-hidden h-full"
+            >
               <div className="absolute inset-0 bg-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
               
+              {/* Pulsing Background */}
+              <motion.div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-violet-500/20 rounded-full blur-[60px]"
+                animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.5, 0.2] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+              />
+
               <div className="relative z-10">
                 <div className="w-24 h-24 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full mx-auto mb-6 flex items-center justify-center text-3xl font-bold text-white shadow-[0_0_20px_rgba(139,92,246,0.3)] group-hover:scale-110 transition-transform duration-300">
                   LK
@@ -473,52 +1036,112 @@ export default function LandingPage() {
                 <p className="text-violet-400 font-mono text-sm mb-8 tracking-widest uppercase">Co-Founder</p>
                 
                 <div className="flex flex-col gap-4 items-center">
-                  <a href="tel:9251072575" className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/5 w-full justify-center">
-                    <Phone className="w-4 h-4" /> 9251072575
+                  <a href="tel:9251072575" className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/5 w-full justify-center group">
+                    <motion.div whileHover={{ scale: 1.2 }} transition={{ duration: 0.2 }}>
+                      <Phone className="w-5 h-5" />
+                    </motion.div>
+                    9251072575
                   </a>
                   <a 
                     href="https://wa.me/919251072575" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-[#25D366] text-white px-6 py-3 rounded-full text-sm font-bold hover:bg-[#20bd5a] transition-all shadow-lg shadow-green-900/20 w-full justify-center"
+                    className="flex items-center gap-2 bg-slate-900 border border-slate-700 text-white px-6 py-3 rounded-full text-sm font-bold hover:bg-slate-800 hover:border-indigo-500 transition-all shadow-lg shadow-indigo-900/10 w-full justify-center group"
                   >
-                    <WhatsAppIcon className="w-5 h-5" /> Chat on WhatsApp
+                    <motion.div whileHover={{ scale: 1.2 }}>
+                      <WhatsAppIcon className="w-5 h-5 text-green-500" />
+                    </motion.div>
+                    Chat on WhatsApp
                   </a>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </FadeIn>
 
-          {/* Faculty 1 */}
-          <FadeIn delay={0.3}>
-            <div className="bg-gradient-to-b from-white/[0.05] to-transparent p-10 rounded-3xl border border-white/10 hover:border-pink-500/50 transition-all duration-300 text-center group relative overflow-hidden h-full">
-              <div className="absolute inset-0 bg-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              
-              <div className="relative z-10">
-                <div className="w-24 h-24 bg-gradient-to-br from-pink-500 to-rose-600 rounded-full mx-auto mb-6 flex items-center justify-center text-3xl font-bold text-white shadow-[0_0_20px_rgba(236,72,153,0.3)] group-hover:scale-110 transition-transform duration-300">
-                  AM
-                </div>
-                <h3 className="text-2xl font-bold mb-1 text-white">Avani Ma'am</h3>
-                <p className="text-pink-400 font-mono text-sm mb-8 tracking-widest uppercase">Faculty Advisor</p>
-              </div>
-            </div>
-          </FadeIn>
-
-          {/* Faculty 2 */}
+          {/* Mentor */}
           <FadeIn delay={0.4}>
-            <div className="bg-gradient-to-b from-white/[0.05] to-transparent p-10 rounded-3xl border border-white/10 hover:border-pink-500/50 transition-all duration-300 text-center group relative overflow-hidden h-full">
+            <motion.div 
+              whileHover={{ y: -10 }}
+              className="bg-gradient-to-b from-white/[0.05] to-transparent p-10 rounded-3xl border border-white/10 hover:border-pink-500/50 transition-colors duration-300 text-center group relative overflow-hidden h-full"
+            >
               <div className="absolute inset-0 bg-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
               
+              {/* Pulsing Background */}
+              <motion.div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-rose-500/20 rounded-full blur-[60px]"
+                animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.5, 0.2] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+              />
+
               <div className="relative z-10">
                 <div className="w-24 h-24 bg-gradient-to-br from-rose-500 to-red-600 rounded-full mx-auto mb-6 flex items-center justify-center text-3xl font-bold text-white shadow-[0_0_20px_rgba(244,63,94,0.3)] group-hover:scale-110 transition-transform duration-300">
                   DM
                 </div>
                 <h3 className="text-2xl font-bold mb-1 text-white">Dulari Ma'am</h3>
-                <p className="text-rose-400 font-mono text-sm mb-8 tracking-widest uppercase">Faculty Advisor</p>
+                <p className="text-rose-400 font-mono text-sm mb-8 tracking-widest uppercase">Mentor</p>
+              </div>
+            </motion.div>
+          </FadeIn>
+        </div>
+
+        {/* Social Connect */}
+        <FadeIn delay={0.5}>
+            <div className="mt-16 pt-10 border-t border-white/10 text-center">
+              <h3 className="text-2xl font-bold mb-8 text-white">Connect with E-Cell RIET</h3>
+              <div className="flex flex-wrap justify-center gap-6">
+                <motion.a 
+                  href={INSTAGRAM_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center justify-center gap-3 bg-white/5 border border-white/10 w-56 py-4 rounded-full text-slate-400 hover:text-white hover:bg-white/10 hover:border-indigo-200/30 transition-all duration-300 group"
+                >
+                  <motion.div whileHover={{ rotate: 15, scale: 1.1 }}>
+                    <Instagram className="w-5 h-5 group-hover:text-pink-500 transition-colors" />
+                  </motion.div>
+                  <span className="font-medium">Instagram</span>
+                </motion.a>
+                <motion.a 
+                  href={WHATSAPP_GROUP_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center justify-center gap-3 bg-white/5 border border-white/10 w-56 py-4 rounded-full text-slate-400 hover:text-white hover:bg-white/10 hover:border-indigo-200/30 transition-all duration-300 group"
+                >
+                  <motion.div whileHover={{ rotate: -10, scale: 1.1 }}>
+                    <WhatsAppIcon className="w-5 h-5 group-hover:text-green-500 transition-colors" />
+                  </motion.div>
+                  <span className="font-medium">WhatsApp Group</span>
+                </motion.a>
+                <motion.a 
+                  href={LINKEDIN_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center justify-center gap-3 bg-white/5 border border-white/10 w-56 py-4 rounded-full text-slate-400 hover:text-white hover:bg-white/10 hover:border-indigo-200/30 transition-all duration-300 group"
+                >
+                  <motion.div whileHover={{ rotate: 10, scale: 1.1 }}>
+                    <Linkedin className="w-5 h-5 group-hover:text-blue-500 transition-colors" />
+                  </motion.div>
+                  <span className="font-medium">LinkedIn</span>
+                </motion.a>
+                <motion.a 
+                  href="mailto:riet.ecell@gmail.com"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center justify-center gap-3 bg-white/5 border border-white/10 w-56 py-4 rounded-full text-slate-400 hover:text-white hover:bg-white/10 hover:border-indigo-200/30 transition-all duration-300 group"
+                >
+                  <motion.div whileHover={{ scale: 1.1 }}>
+                    <Mail className="w-5 h-5 group-hover:text-indigo-500 transition-colors" />
+                  </motion.div>
+                  <span className="font-medium">Email Us</span>
+                </motion.a>
               </div>
             </div>
           </FadeIn>
-        </div>
       </Section>
 
       {/* 8. FOOTER */}
@@ -527,65 +1150,20 @@ export default function LandingPage() {
         <div className="space-y-6 text-sm text-slate-500 relative z-10">
           <div className="mb-8">
             <p className="font-bold text-white text-2xl tracking-tight mb-2">E-Cell RIET</p>
-            <p className="text-indigo-400 font-mono text-xs tracking-widest uppercase">Innovation • Execution • Growth</p>
+            <p className="text-slate-400">Rajasthan Institute of Engineering & Technology, Jaipur</p>
           </div>
           
-          <div className="flex justify-center gap-6 mb-8">
-             <a 
-              href={INSTAGRAM_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-pink-500 hover:bg-white/10 hover:border-pink-500/50 transition-all duration-300 group"
-            >
-              <motion.div
-                whileHover={{ rotate: 15, scale: 1.1 }}
-              >
-                <Instagram className="w-6 h-6" />
-              </motion.div>
-            </a>
-            <a 
-              href={WHATSAPP_GROUP_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-green-500 hover:bg-white/10 hover:border-green-500/50 transition-all duration-300 group"
-            >
-              <motion.div
-                whileHover={{ scale: 1.1, rotate: -10 }}
-              >
-                <WhatsAppIcon className="w-6 h-6" />
-              </motion.div>
-            </a>
-            <a 
-              href={LINKEDIN_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-blue-500 hover:bg-white/10 hover:border-blue-500/50 transition-all duration-300 group"
-            >
-              <motion.div
-                whileHover={{ scale: 1.1, rotate: 10 }}
-              >
-                <Linkedin className="w-6 h-6" />
-              </motion.div>
-            </a>
-            <a 
-              href="mailto:riet.ecell@gmail.com"
-              className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/30 transition-all duration-300 group"
-            >
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-              >
-                <Mail className="w-6 h-6" />
-              </motion.div>
-            </a>
+          <div className="flex justify-center gap-8 mb-8">
+            <a href="#how-it-works" onClick={(e) => handleSmoothScroll(e, 'how-it-works')} className="hover:text-indigo-400 transition-colors">Program</a>
+            <a href="#mission" onClick={(e) => handleSmoothScroll(e, 'mission')} className="hover:text-indigo-400 transition-colors">Mission</a>
+            <a href="#faq" onClick={(e) => handleSmoothScroll(e, 'faq')} className="hover:text-indigo-400 transition-colors">FAQ</a>
           </div>
 
-          <div className="space-y-2">
-            <p className="text-slate-400">riet.ecell@gmail.com</p>
-          </div>
+          <p className="text-indigo-400 font-mono text-xs tracking-widest uppercase mb-8">Innovation • Execution • Growth</p>
 
           <div className="pt-8 border-t border-white/5 max-w-md mx-auto mt-8 px-6">
-            <p className="font-medium text-slate-300">Rajasthan Institute of Engineering & Technology, Jaipur</p>
-            <p className="text-xs opacity-40 mt-4">© {new Date().getFullYear()} E-Cell RIET. All Rights Reserved.</p>
+            <p className="text-xs opacity-40">© {new Date().getFullYear()} E-Cell RIET. All Rights Reserved.</p>
+            <p className="text-xs opacity-30 mt-2">Built by builders, for builders.</p>
           </div>
         </div>
       </footer>
